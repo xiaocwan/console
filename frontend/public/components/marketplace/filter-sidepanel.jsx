@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FilterSidePanel } from 'patternfly-react-extensions';
 import { Icon, FormControl } from 'patternfly-react';
+import { navSectionFor } from 'integration-tests/views/sidenav.view';
 
 class MarketplaceFilterSidePanel extends React.Component {
   state = {

@@ -313,3 +313,96 @@ export const mockItems = [
     ]
   }
 ];
+
+
+export const mockFilterExampleFields = [
+  {
+    id: 'name',
+    title: 'Name',
+    placeholder: 'Filter by Name',
+    filterType: 'text'
+  },
+  {
+    id: 'address',
+    title: 'Address',
+    placeholder: 'Filter by Address',
+    filterType: 'text'
+  },
+  {
+    id: 'birthMonth',
+    title: 'Birth Month',
+    placeholder: 'Filter by Birth Month',
+    filterType: 'select',
+    filterValues: [
+      { title: 'January', id: 'jan' },
+      { title: 'February', id: 'feb' },
+      { title: 'March', id: 'mar' },
+      { title: 'April', id: 'apr' },
+      { title: 'May', id: 'may' },
+      { title: 'June', id: 'jun' },
+      { title: 'July', id: 'jul' },
+      { title: 'August', id: 'aug' },
+      { title: 'September', id: 'sep' },
+      { title: 'October', id: 'oct' },
+      { title: 'November', id: 'nov' },
+      { title: 'December', id: 'dec' }
+    ]
+  },
+  {
+    id: 'car',
+    title: 'Car',
+    placeholder: 'Filter by Car Make',
+    filterType: 'complex-select',
+    filterValues: [{ title: 'Subaru', id: 'subie' }, 'Toyota'],
+    filterCategoriesPlaceholder: 'Filter by Car Model',
+    filterCategories: [
+      {
+        id: 'subie',
+        title: 'Subaru',
+        filterValues: [
+          {
+            title: 'Outback',
+            id: 'out'
+          },
+          'Crosstrek',
+          'Impreza'
+        ]
+      },
+      {
+        id: 'toyota',
+        title: 'Toyota',
+        filterValues: [
+          {
+            title: 'Prius',
+            id: 'pri'
+          },
+          'Corolla',
+          'Echo'
+        ]
+      }
+    ]
+  }
+];
+
+export const mockSortFields = [
+  {
+    id: 'name',
+    title: 'Name',
+    isNumeric: false
+  },
+  {
+    id: 'address',
+    title: 'Address',
+    isNumeric: false
+  },
+  {
+    id: 'birthMonth',
+    title: 'Birth Month',
+    isNumeric: true
+  },
+  {
+    id: 'car',
+    title: 'Car',
+    isNumeric: false
+  }
+];
