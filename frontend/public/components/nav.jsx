@@ -377,10 +377,10 @@ export class Nav extends React.Component {
           </NavSection>
 
           <NavSection required={FLAGS.OPERATOR_LIFECYCLE_MANAGER} text="Operators" img={operatorImg} activeImg={operatorActiveImg} >
+            <ResourceNSLink model={KubernetesMarketplaceModel} resource={KubernetesMarketplaceModel.plural} name="Kubernetes Marketplace" onClick={this.close} />
             <ResourceNSLink model={ClusterServiceVersionModel} resource={ClusterServiceVersionModel.plural} name="Cluster Service Versions" onClick={this.close} />
             <Sep />
             <ResourceNSLink model={CatalogSourceModel} resource={CatalogSourceModel.plural} name="Catalog Sources" onClick={this.close} />
-            <ResourceNSLink model={KubernetesMarketplaceModel} resource={KubernetesMarketplaceModel.plural} name="Kubernetes Marketplace" onClick={this.close} />
             <ResourceNSLink model={SubscriptionModel} resource={SubscriptionModel.plural} name="Subscriptions" onClick={this.close} />
             <ResourceNSLink model={InstallPlanModel} resource={InstallPlanModel.plural} name="Install Plans" onClick={this.close} />
           </NavSection>

@@ -4,6 +4,8 @@ import { mockItems } from './mockItems';
 
 import { CatalogTile, CatalogTileBadge, CatalogTileView, CatalogTileViewCategory } from 'patternfly-react-extensions';
 
+import { MarketplaceToolbar } from './toolbar';
+
 class MarketplaceCatalogTileView extends React.Component {
   constructor(props) {
     super(props);
@@ -73,8 +75,12 @@ class MarketplaceCatalogTileView extends React.Component {
           <Breadcrumb.Item href="#" active={!activeCategory} onClick={() => this.onViewAll(null)}>
             All Categories
           </Breadcrumb.Item>
+          
           {activeCategory && <Breadcrumb.Item active>{activeCategory.category}</Breadcrumb.Item>}
         </Breadcrumb>
+        
+        <MarketplaceToolbar/>
+        
         <CatalogTileView>
           {activeCategory
             ? this.renderCategory(activeCategory)
