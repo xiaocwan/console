@@ -1,10 +1,12 @@
 import React from 'react';
-import { Breadcrumb } from 'patternfly-react';
-import { mockItems } from './mockItems';
-
+import PropTypes from 'prop-types';
+import { Breadcrumb, ModelessOverlay, Button, Modal } from 'patternfly-react';
 import { CatalogTile, CatalogTileBadge, CatalogTileView, CatalogTileViewCategory } from 'patternfly-react-extensions';
 
+import { mockTileItems } from './mockItems';
 import { MarketplaceToolbar } from './toolbar';
+import { MarketplaceModelessOverlay } from './modeless-manager';
+import { interpolateMagma } from 'd3';
 
 class MarketplaceCatalogTileView extends React.Component {
   constructor(props) {
@@ -17,20 +19,6 @@ class MarketplaceCatalogTileView extends React.Component {
 
   onViewAll = id => {
     this.setState({ showAll: id });
-  };
-
-  getBadges = item => {
-    const badges = [];
-
-    if (item.certified) {
-      badges.push(<CatalogTileBadge key="certified" type="fa" name="cog" title="Certified" id="certified" />);
-    }
-
-    if (item.approved) {
-      badges.push(<CatalogTileBadge key="certified" type="pf" name="ok" title="USDA Approved" id="approved" />);
-    }
-
-    return badges;
   };
 
   renderCategory = category => {
@@ -46,17 +34,7 @@ class MarketplaceCatalogTileView extends React.Component {
           onViewAll={() => this.onViewAll(category.id)}
         >
           {category.items &&
-            category.items.map((item, index) => (
-              <CatalogTile
-                key={`tile-${index}`}
-                title={item.title}
-                featured={item.featured}
-                iconImg={item.image}
-                vendor={item.vendor}
-                description={item.description}
-                badges={this.getBadges(item)}
-              />
-            ))}
+            category.items.map((item, index) => <MarketplaceModelessOverlay key={index} item={item} index={index}/>)}
         </CatalogTileViewCategory>
       );
     }
@@ -79,16 +57,16 @@ class MarketplaceCatalogTileView extends React.Component {
           {activeCategory && <Breadcrumb.Item active>{activeCategory.category}</Breadcrumb.Item>}
         </Breadcrumb>
 
-        <MarketplaceToolbar onSortChanged={null}/>
+        <MarketplaceToolbar onSortChanged={null} />
 
         <CatalogTileView>
           {activeCategory
             ? this.renderCategory(activeCategory)
-            : mockItems.map(category => this.renderCategory(category))}
+            : mockTileItems.map(category => this.renderCategory(category))}
         </CatalogTileView>
       </div>
     );
   }
-}
+};
 
 export { MarketplaceCatalogTileView };

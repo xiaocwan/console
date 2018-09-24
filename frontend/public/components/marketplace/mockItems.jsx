@@ -7,7 +7,7 @@ import instagram from 'patternfly/dist/img/instagram-logo.png';
 import twitter from 'patternfly/dist/img/twitter-logo.svg';
 import skype from 'patternfly/dist/img/skype-logo.svg';
 
-export const mockItems = [
+export const mockTileItems = [
   {
     category: 'Social Media',
     id: 'social-media',
@@ -582,5 +582,40 @@ export const mockVerticalTabsMarketplace = [
   {
     id: "cms",
     title: "Blogs & CMS"
+  }
+];
+
+export const mockPropertyItems = [
+  {
+    label: 'Operator Version',
+    value: '0.9.8 (latest)'
+  },
+  {
+    label: 'Certified Level',
+    value: 'Certified'
+  },
+  {
+    label: 'Provider',
+    value: 'Red Hat, Inc'
+  },
+  {
+    label: 'Health Index',
+    value: 'A'
+  },
+  {
+    label: 'Repository',
+    value: <a href="#">quay.ioo</a>
+  },
+  {
+    label: 'Container Image',
+    value: <a href="#">0.22.2</a>
+  },
+  {
+    label: 'Created At',
+    value: <span>Aug 23rd, 2018</span>
+  },
+  {
+    label: 'Support',
+      value: <a href="#">Red Hat</a>
   }
 ];
