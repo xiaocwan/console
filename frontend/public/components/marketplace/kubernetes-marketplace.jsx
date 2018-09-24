@@ -19,11 +19,10 @@ export class KubernetesMarketplace extends React.Component {
             <NavTitle
               title="Kubernetes Markteplace"
               detail={true}
-              >
-              <div className="co-m-pane__filter-bar-group co-m-pane__filter-bar-group--filter">
-                <TextFilter label="Kubernetes Markteplace by name" />
-              </div>
-            </NavTitle>
+            />
+            <div className="co-m-pane__filter-bar-group co-m-pane__filter-bar-group--filter">
+              <TextFilter label="Kubernetes Markteplace by name" />
+            </div>
 
             <div>
               <div style={{ margin: '15px', width: '15%', border: 'none', float: 'left' }}>

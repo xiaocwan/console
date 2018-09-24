@@ -4,6 +4,31 @@ import { FilterSidePanel } from 'patternfly-react-extensions';
 import { Icon, FormControl } from 'patternfly-react';
 import { navSectionFor } from 'integration-tests/views/sidenav.view';
 
+// make the filter sidebar follow some object structure
+// Follow the templates in mockItems.jsx
+const mockFilterSidebar = [
+  {
+    title: "Kubernetes Apps",
+    count: 23,
+    type: "typeKubernetesApps"
+  },
+  {
+    title: "Source-to-Image",
+    count:11,
+    type:"typeSourceToImage"
+  },
+  {
+    title: "Container Images",
+    count: 5,
+    type: "typeContainerImages"
+  },
+  {
+    title: "Off-Cluster Services",
+    count: 3,
+    type: "typeOffClusterServices"
+  }
+]
+
 class MarketplaceFilterSidePanel extends React.Component {
   state = {
     activeFilters: {
@@ -54,6 +79,15 @@ class MarketplaceFilterSidePanel extends React.Component {
     const { activeFilters, showAllCategories } = this.state;
     const { maxShowCount, leeway } = this.props;
 
+    const FilterItem = ({item}) => {
+      return <FilterSidePanel.CategoryItem
+        children={item.title}
+        count={item.count}
+        checked={activeFilters[item.type]}
+        onChange={e => this.onFilterChange(item.type, e.target.checked)}
+      />
+    };
+
     return (
       <FilterSidePanel id="filter-panel">
         <FilterSidePanel.Category>
@@ -66,34 +100,16 @@ class MarketplaceFilterSidePanel extends React.Component {
           showAll={showAllCategories.type}
           onShowAllToggle={() => this.onShowAllToggle('type')}
         >
-          <FilterSidePanel.CategoryItem
-            count={23}
-            checked={activeFilters.typeKubernetesApps}
-            onChange={e => this.onFilterChange('typeKubernetesApps', e.target.checked)}
-          >
-            Kubernetes Apps
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={11}
-            checked={activeFilters.typeSourceToImage}
-            onChange={e => this.onFilterChange('typeSourceToImage', e.target.checked)}
-          >
-            Source-to-Image
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={5}
-            checked={activeFilters.typeContainerImages}
-            onChange={e => this.onFilterChange('typeContainerImages', e.target.checked)}
-          >
-            Container Images
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={3}
-            checked={activeFilters.typeOffClusterServices}
-            onChange={e => this.onFilterChange('typeOffClusterServices', e.target.checked)}
-          >
-            Off-Cluster Services
-          </FilterSidePanel.CategoryItem>
+          {mockFilterSidebar &&
+            mockFilterSidebar.map((item, index) => (
+              <FilterSidePanel.CategoryItem
+                key={`filter-${index}`}
+                children={item.title}
+                count={item.count}
+                checked={activeFilters[item.type]}
+                onChange={e => this.onFilterChange(item.type, e.target.checked)}
+              />
+            ))}
         </FilterSidePanel.Category>
         <FilterSidePanel.Category
           title="Upgrade"
