@@ -56,6 +56,9 @@ class MarketplaceFilterSidePanel extends React.Component {
 
     return (
       <FilterSidePanel id="filter-panel">
+        <FilterSidePanel.Category>
+          <FormControl type="text" placeholder="Filter by keyword..." bsClass="form-control" />
+        </FilterSidePanel.Category>
         <FilterSidePanel.Category
           title="Type"
           maxShowCount={maxShowCount}
@@ -68,28 +71,28 @@ class MarketplaceFilterSidePanel extends React.Component {
             checked={activeFilters.typeKubernetesApps}
             onChange={e => this.onFilterChange('typeKubernetesApps', e.target.checked)}
           >
-            Kubernetes Apps 
+            Kubernetes Apps
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={11}
             checked={activeFilters.typeSourceToImage}
             onChange={e => this.onFilterChange('typeSourceToImage', e.target.checked)}
           >
-            Source-to-Image 
+            Source-to-Image
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={5}
             checked={activeFilters.typeContainerImages}
             onChange={e => this.onFilterChange('typeContainerImages', e.target.checked)}
           >
-            Container Images 
+            Container Images
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={3}
             checked={activeFilters.typeOffClusterServices}
             onChange={e => this.onFilterChange('typeOffClusterServices', e.target.checked)}
           >
-            Off-Cluster Services 
+            Off-Cluster Services
           </FilterSidePanel.CategoryItem>
         </FilterSidePanel.Category>
         <FilterSidePanel.Category
@@ -104,14 +107,14 @@ class MarketplaceFilterSidePanel extends React.Component {
             checked={activeFilters.upgradeAuto}
             onChange={e => this.onFilterChange('upgradeAuto', e.target.checked)}
           >
-            Auto 
+            Auto
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={5}
             checked={activeFilters.upgradeManual}
             onChange={e => this.onFilterChange('upgradeManual', e.target.checked)}
           >
-            Manual 
+            Manual
           </FilterSidePanel.CategoryItem>
         </FilterSidePanel.Category>
         <FilterSidePanel.Category
@@ -125,25 +128,25 @@ class MarketplaceFilterSidePanel extends React.Component {
             checked={activeFilters.ceritfiedCertified2}
             onChange={e => this.onFilterChange('certifiedCertified2', e.target.checked)}
           >
-            Certified II 
+            Certified II
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             checked={activeFilters.ceritfiedCertified1}
             onChange={e => this.onFilterChange('certifiedCertified1', e.target.checked)}
           >
-            Certified I 
+            Certified I
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             checked={activeFilters.certifiedPrimed}
             onChange={e => this.onFilterChange('certifiedPrimed', e.target.checked)}
           >
-            Certified Primed 
+            Certified Primed
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             checked={activeFilters.certifiedCommunity}
             onChange={e => this.onFilterChange('certifiedCommunity', e.target.checked)}
           >
-            Certified Community 
+            Certified Community
           </FilterSidePanel.CategoryItem>
         </FilterSidePanel.Category>
         <FilterSidePanel.Category
@@ -158,35 +161,35 @@ class MarketplaceFilterSidePanel extends React.Component {
             checked={activeFilters.providerRedHat}
             onChange={e => this.onFilterChange('providerRedHat', e.target.checked)}
           >
-            Red Hat, Inc 
+            Red Hat, Inc
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={7}
             checked={activeFilters.providerCouchbase}
             onChange={e => this.onFilterChange('providerCouchbase', e.target.checked)}
           >
-            Couchbase 
+            Couchbase
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={9}
             checked={activeFilters.providerCrunchyData}
             onChange={e => this.onFilterChange('providerCrunchyData', e.target.checked)}
           >
-            Crunchy Data 
+            Crunchy Data
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={12}
             checked={activeFilters.providerDynatrace}
             onChange={e => this.onFilterChange('providerDynatrace', e.target.checked)}
           >
-            Dynatrace 
+            Dynatrace
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={8}
             checked={activeFilters.providerF5Networks}
             onChange={e => this.onFilterChange('providerF5Networks', e.target.checked)}
           >
-            F5 Networks 
+            F5 Networks
           </FilterSidePanel.CategoryItem>
         </FilterSidePanel.Category>
         <FilterSidePanel.Category
@@ -201,43 +204,43 @@ class MarketplaceFilterSidePanel extends React.Component {
             checked={activeFilters.healthA}
             onChange={e => this.onFilterChange('healthA', e.target.checked)}
           >
-            A 
+            A
           </FilterSidePanel.CategoryItem>
-          
+
           <FilterSidePanel.CategoryItem
             count={12}
             checked={activeFilters.healthB}
             onChange={e => this.onFilterChange('healthB', e.target.checked)}
           >
-            B 
+            B
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={8}
             checked={activeFilters.healthC}
             onChange={e => this.onFilterChange('healthC', e.target.checked)}
           >
-          C 
+          C
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={5}
             checked={activeFilters.healthD}
             onChange={e => this.onFilterChange('healthD', e.target.checked)}
           >
-            D 
+            D
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={3}
             checked={activeFilters.healthE}
             onChange={e => this.onFilterChange('healthE', e.target.checked)}
           >
-            E 
+            E
           </FilterSidePanel.CategoryItem>
           <FilterSidePanel.CategoryItem
             count={3}
             checked={activeFilters.healthF}
             onChange={e => this.onFilterChange('healthF', e.target.checked)}
           >
-            F 
+            F
           </FilterSidePanel.CategoryItem>
         </FilterSidePanel.Category>
       </FilterSidePanel>

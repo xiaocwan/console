@@ -2,12 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  Button,
-  DropdownKebab,
-  Filter,
-  FormControl,
-  Icon,
-  MenuItem,
   Sort,
   Toolbar
 } from 'patternfly-react';
@@ -17,15 +11,18 @@ import { mockSortFields, mockFilterExampleFields } from './mockItems';
 const noop = Function.prototype;
 
 export class MarketplaceToolbar extends React.Component {
-    state = {
+  constructor (props) {
+    super(props);
+    this.state = {
       currentFilterType: mockFilterExampleFields[0],
       activeFilters: [],
       currentValue: '',
       currentSortType: mockSortFields[0],
       isSortNumeric: mockSortFields[0].isNumeric,
       isSortAscending: true,
-      currentViewType: 'list'
+      currentViewType: 'list',
     };
+  }
 
   setViewType(viewType) {
     const { onViewChanged } = this.props;
@@ -71,22 +68,21 @@ export class MarketplaceToolbar extends React.Component {
       currentViewType
     } = this.state;
 
-    const { onActionPerformed, onFindAction } = this.props;
-
     return (
       <Toolbar>
         <Toolbar.Results>
             <h5>40 Results</h5>
         </Toolbar.Results>
 
-        <Toolbar.RightContent>
+        <Toolbar.RightContent style={{borderLeft:"1px solid rgb(209, 209, 209)"}}>
           <Sort>
-              Sort by  .
+              {'Sort by '}
             <Sort.TypeSelector
                 sortTypes={mockSortFields}
                 currentSortType={currentSortType}
                 onSortTypeSelected={this.updateCurrentSortType}
             />
+
             <Sort.DirectionSelector
                 isNumeric={isSortNumeric}
                 isAscending={isSortAscending}

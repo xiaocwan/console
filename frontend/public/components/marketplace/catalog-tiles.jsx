@@ -75,12 +75,12 @@ class MarketplaceCatalogTileView extends React.Component {
           <Breadcrumb.Item href="#" active={!activeCategory} onClick={() => this.onViewAll(null)}>
             All Categories
           </Breadcrumb.Item>
-          
+
           {activeCategory && <Breadcrumb.Item active>{activeCategory.category}</Breadcrumb.Item>}
         </Breadcrumb>
-        
-        <MarketplaceToolbar/>
-        
+
+        <MarketplaceToolbar onSortChanged={null}/>
+
         <CatalogTileView>
           {activeCategory
             ? this.renderCategory(activeCategory)
