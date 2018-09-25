@@ -3,31 +3,7 @@ import PropTypes from 'prop-types';
 import { FilterSidePanel } from 'patternfly-react-extensions';
 import { Icon, FormControl } from 'patternfly-react';
 import { navSectionFor } from 'integration-tests/views/sidenav.view';
-
-// make the filter sidebar follow some object structure
-// Follow the templates in mockItems.jsx
-const mockFilterSidebar = [
-  {
-    title: "Kubernetes Apps",
-    count: 23,
-    type: "typeKubernetesApps"
-  },
-  {
-    title: "Source-to-Image",
-    count:11,
-    type:"typeSourceToImage"
-  },
-  {
-    title: "Container Images",
-    count: 5,
-    type: "typeContainerImages"
-  },
-  {
-    title: "Off-Cluster Services",
-    count: 3,
-    type: "typeOffClusterServices"
-  }
-]
+import { mockFilterSidebarCategories } from './mockItems';
 
 class MarketplaceFilterSidePanel extends React.Component {
   state = {
@@ -79,186 +55,37 @@ class MarketplaceFilterSidePanel extends React.Component {
     const { activeFilters, showAllCategories } = this.state;
     const { maxShowCount, leeway } = this.props;
 
-    const FilterItem = ({item}) => {
-      return <FilterSidePanel.CategoryItem
-        children={item.title}
-        count={item.count}
-        checked={activeFilters[item.type]}
-        onChange={e => this.onFilterChange(item.type, e.target.checked)}
-      />
-    };
-
     return (
       <FilterSidePanel id="filter-panel">
         <FilterSidePanel.Category>
           <FormControl type="text" placeholder="Filter by keyword..." bsClass="form-control" />
         </FilterSidePanel.Category>
-        <FilterSidePanel.Category
-          title="Type"
-          maxShowCount={maxShowCount}
-          leeway={leeway}
-          showAll={showAllCategories.type}
-          onShowAllToggle={() => this.onShowAllToggle('type')}
-        >
-          {mockFilterSidebar &&
-            mockFilterSidebar.map((item, index) => (
-              <FilterSidePanel.CategoryItem
-                key={`filter-${index}`}
-                children={item.title}
-                count={item.count}
-                checked={activeFilters[item.type]}
-                onChange={e => this.onFilterChange(item.type, e.target.checked)}
-              />
-            ))}
-        </FilterSidePanel.Category>
-        <FilterSidePanel.Category
-          title="Upgrade"
-          maxShowCount={maxShowCount}
-          leeway={leeway}
-          showAll={showAllCategories.upgrade}
-          onShowAllToggle={() => this.onShowAllToggle('upgrade')}
-        >
-          <FilterSidePanel.CategoryItem
-            count={6}
-            checked={activeFilters.upgradeAuto}
-            onChange={e => this.onFilterChange('upgradeAuto', e.target.checked)}
-          >
-            Auto
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={5}
-            checked={activeFilters.upgradeManual}
-            onChange={e => this.onFilterChange('upgradeManual', e.target.checked)}
-          >
-            Manual
-          </FilterSidePanel.CategoryItem>
-        </FilterSidePanel.Category>
-        <FilterSidePanel.Category
-          title="Certified Level"
-          maxShowCount={maxShowCount}
-          leeway={leeway}
-          showAll={showAllCategories.certifiedLevel}
-          onShowAllToggle={() => this.onShowAllToggle('certifiedLevel')}
-        >
-          <FilterSidePanel.CategoryItem
-            checked={activeFilters.ceritfiedCertified2}
-            onChange={e => this.onFilterChange('certifiedCertified2', e.target.checked)}
-          >
-            Certified II
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            checked={activeFilters.ceritfiedCertified1}
-            onChange={e => this.onFilterChange('certifiedCertified1', e.target.checked)}
-          >
-            Certified I
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            checked={activeFilters.certifiedPrimed}
-            onChange={e => this.onFilterChange('certifiedPrimed', e.target.checked)}
-          >
-            Certified Primed
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            checked={activeFilters.certifiedCommunity}
-            onChange={e => this.onFilterChange('certifiedCommunity', e.target.checked)}
-          >
-            Certified Community
-          </FilterSidePanel.CategoryItem>
-        </FilterSidePanel.Category>
-        <FilterSidePanel.Category
-          title="Provider"
-          maxShowCount={maxShowCount}
-          leeway={leeway}
-          showAll={showAllCategories.mileage}
-          onShowAllToggle={() => this.onShowAllToggle('provider')}
-        >
-          <FilterSidePanel.CategoryItem
-            count={3}
-            checked={activeFilters.providerRedHat}
-            onChange={e => this.onFilterChange('providerRedHat', e.target.checked)}
-          >
-            Red Hat, Inc
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={7}
-            checked={activeFilters.providerCouchbase}
-            onChange={e => this.onFilterChange('providerCouchbase', e.target.checked)}
-          >
-            Couchbase
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={9}
-            checked={activeFilters.providerCrunchyData}
-            onChange={e => this.onFilterChange('providerCrunchyData', e.target.checked)}
-          >
-            Crunchy Data
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={12}
-            checked={activeFilters.providerDynatrace}
-            onChange={e => this.onFilterChange('providerDynatrace', e.target.checked)}
-          >
-            Dynatrace
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={8}
-            checked={activeFilters.providerF5Networks}
-            onChange={e => this.onFilterChange('providerF5Networks', e.target.checked)}
-          >
-            F5 Networks
-          </FilterSidePanel.CategoryItem>
-        </FilterSidePanel.Category>
-        <FilterSidePanel.Category
-          title="Health Index"
-          maxShowCount={maxShowCount}
-          leeway={leeway}
-          showAll={showAllCategories.healthIndex}
-          onShowAllToggle={() => this.onShowAllToggle('healthIndex')}
-        >
-          <FilterSidePanel.CategoryItem
-            count={2}
-            checked={activeFilters.healthA}
-            onChange={e => this.onFilterChange('healthA', e.target.checked)}
-          >
-            A
-          </FilterSidePanel.CategoryItem>
-
-          <FilterSidePanel.CategoryItem
-            count={12}
-            checked={activeFilters.healthB}
-            onChange={e => this.onFilterChange('healthB', e.target.checked)}
-          >
-            B
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={8}
-            checked={activeFilters.healthC}
-            onChange={e => this.onFilterChange('healthC', e.target.checked)}
-          >
-          C
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={5}
-            checked={activeFilters.healthD}
-            onChange={e => this.onFilterChange('healthD', e.target.checked)}
-          >
-            D
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={3}
-            checked={activeFilters.healthE}
-            onChange={e => this.onFilterChange('healthE', e.target.checked)}
-          >
-            E
-          </FilterSidePanel.CategoryItem>
-          <FilterSidePanel.CategoryItem
-            count={3}
-            checked={activeFilters.healthF}
-            onChange={e => this.onFilterChange('healthF', e.target.checked)}
-          >
-            F
-          </FilterSidePanel.CategoryItem>
-        </FilterSidePanel.Category>
+        {
+          mockFilterSidebarCategories &&
+          mockFilterSidebarCategories.map((category, index) => (
+            <FilterSidePanel.Category
+              key={`filter-category-${category.type}-${index}`}
+              title={category.title}
+              maxShowCount={maxShowCount}
+              leeway={leeway}
+              showAll={showAllCategories[category.type]}
+              onShowAllToggle={() => this.onShowAllToggle(category.type)}
+            >
+              {
+                category.items &&
+                category.items.map((item, index) => (
+                  <FilterSidePanel.CategoryItem
+                    key={`filter-item-${category.type}-${item.type}-${index}`}
+                    children={item.title}
+                    count={item.count}
+                    checked={activeFilters[item.type]}
+                    onChange={e => this.onFilterChange(item.type, e.target.checked)}
+                  />
+                ))
+              }
+            </FilterSidePanel.Category>
+          ))
+        }
       </FilterSidePanel>
     );
   }

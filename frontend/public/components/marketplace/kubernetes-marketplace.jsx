@@ -16,29 +16,25 @@ export class KubernetesMarketplace extends React.Component {
             <Helmet>
               <title>Kubernetes Marketplace</title>
             </Helmet>
-            <NavTitle
-              title="Kubernetes Markteplace"
-              detail={true}
-            />
+            <NavTitle title="Kubernetes Markteplace"/>
             <div className="co-m-pane__filter-bar-group co-m-pane__filter-bar-group--filter">
               <TextFilter label="Kubernetes Markteplace by name" />
             </div>
 
-            <div>
-              <div style={{ margin: '15px', width: '15%', border: 'none', float: 'left' }}>
-                <MarketplaceVerticalTabs/>
+            <div style={{ margin: '15px', width: '220px', border: 'none', float: 'left' }}>
+              <MarketplaceVerticalTabs/>
+              <div style={{ borderBottom:"1px solid rgb(209, 209, 209)" }}>
                 <br/>
-                <MarketplaceFilterSidePanel maxShowCount={5} leeway={2} />
               </div>
+              <MarketplaceFilterSidePanel maxShowCount={5} leeway={2} />
+            </div>
 
-              <div style={{ width: '80%', float: 'left' }}>
-
-                <div style={{ display: 'flex' }}>
-                  <MarketplaceCatalogTileView/>
-                </div>
+            <div style={{ width: '80%', float: 'left' }}>
+              <div style={{ display: 'flex' }}>
+                <MarketplaceCatalogTileView/>
               </div>
             </div>
-        </React.Fragment>
+          </React.Fragment>
         )
     }
 };

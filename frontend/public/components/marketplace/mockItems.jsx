@@ -406,3 +406,181 @@ export const mockSortFields = [
     isNumeric: false
   }
 ];
+
+export const mockFilterSidebarCategories = [
+  {
+    title: "Operator Certified Level",
+    category: 'certifiedLevel',
+    id: 'certifiedLevel',
+    items: [
+      {
+        title: "Certified",
+        type: "certifiedCertified1"
+      },
+      {
+        title: "Primed",
+        type: "certifiedPrimed"
+      },
+      {
+        title: "Community",
+        type: "certifiedCommunity"
+      }
+    ]
+  },
+  {
+    title: "Provider",
+    category: 'provider',
+    id: 'provider',
+    items: [
+      {
+        title: "Red Hat, Inc",
+        count: 3,
+        type: "providerRedHat"
+      },
+      {
+        title: "Couchbase",
+        count: 7,
+        type: "providerCouchbase"
+      },
+      {
+        title: "Crunchy Data",
+        count: 9,
+        type: "providerCrunchyData"
+      },
+      {
+        title: "Dynatrace",
+        count: 12,
+        type: "providerDynatrace"
+      },
+      {
+        title: "F5 Networks",
+        count: 8,
+        type: "providerF5Networks"
+      }
+    ]
+  },
+  {
+    title: "Type",
+    category: 'type',
+    id: 'type',
+    items: [
+      {
+        title: "Kubernetes Apps",
+        count: 23,
+        type: "typeKubernetesApps"
+      },
+      {
+        title: "Source-to-Image",
+        count:11,
+        type:"typeSourceToImage"
+      },
+      {
+        title: "Container Images",
+        count: 5,
+        type: "typeContainerImages"
+      },
+      {
+        title: "Off-Cluster Services",
+        count: 3,
+        type: "typeOffClusterServices"
+      }
+    ]
+  },
+  {
+    title: "Upgrade",
+    category: 'upgrade',
+    id: 'upgrade',
+    items: [
+      {
+        title: "Auto",
+        count: 6,
+        type: "upgradeAuto"
+      },
+      {
+        title: "Manual",
+        count: 5,
+        type:"upgradeManual"
+      }
+    ]
+  },
+  {
+    title: "Health Index",
+    category: 'healthIndex',
+    id: 'healthIndex',
+    items: [
+      {
+        title: "A",
+        count: 2,
+        type: "healthA"
+      },
+      {
+        title: "B",
+        count: 12,
+        type: "healthB"
+      },
+      {
+        title: "C",
+        count: 8,
+        type: "healthC"
+      },
+      {
+        title: "D",
+        count: 5,
+        type: "healthD"
+      },
+      {
+        title: "E",
+        count: 3,
+        type: "healthE"
+      },
+      {
+        title: "F",
+        count: 3,
+        type: "healthF"
+      }
+    ]
+  }
+];
+
+export const mockVerticalTabsMarketplace = [
+  {
+    id: "all",
+    title: "All Categories"
+  },
+  {
+    id: "fea",
+    title: "Featured Services"
+  },
+  {
+    id: "dbs",
+    title: "Databases"
+  },
+  {
+    id: "sto",
+    title: "Storages"
+  },
+  {
+    id: "net",
+    title: "Networking"
+  },
+  {
+    id: "mon",
+    title: "Monitoring"
+  },
+  {
+    id: "dev",
+    title: "Developer Tools"
+  },
+  {
+    id: "ide",
+    title: "Identity"
+  },
+  {
+    id: "sec",
+    title: "Security"
+  },
+  {
+    id: "cms",
+    title: "Blogs & CMS"
+  }
+];
