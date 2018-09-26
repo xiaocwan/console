@@ -68,10 +68,12 @@ export class MarketplaceToolbar extends React.Component {
       currentViewType
     } = this.state;
 
+    const { numItems } = this.props
+    
     return (
       <Toolbar>
         <Toolbar.Results>
-            <h5>40 Results</h5>
+            <h5>{ numItems > 0 ? `${numItems} Results` : `no results` }</h5>
         </Toolbar.Results>
 
         <Toolbar.RightContent style={{borderLeft:"1px solid rgb(209, 209, 209)"}}>

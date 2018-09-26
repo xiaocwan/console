@@ -1,7 +1,7 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
 
-import { ModelessOverlay, Button, Modal } from 'patternfly-react';
+import { Button, Modal } from 'patternfly-react';
 import { CatalogTile, CatalogTileBadge, CatalogItemHeader, PropertiesSidePanel, PropertyItem } from 'patternfly-react-extensions';
 
 import { mockPropertyItems } from './mockItems';
@@ -9,13 +9,19 @@ import { mockPropertyItems } from './mockItems';
 class MarketplaceModelessOverlay extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { showOverlay: false };
+    this.state = { 
+      showOverlay: false 
+    };
   }
   close = () => {
-    this.setState({ showOverlay: false });
+    this.setState({ 
+      showOverlay: false 
+    });
   };
   toggleOpen = () => {
-    this.setState({ showOverlay: !this.state.showOverlay });
+    this.setState({ 
+      showOverlay: !this.state.showOverlay 
+    });
   };
   getBadges = item => {
     const badges = [];
@@ -44,7 +50,7 @@ class MarketplaceModelessOverlay extends React.Component {
           badges={this.getBadges(item)}
           onClick={this.toggleOpen}
         />
-        <ModelessOverlay show={this.state.showOverlay} bsSize={'lg'}>
+        <Modal show={this.state.showOverlay} className='right-side-modal-pf' bsSize={'lg'}>
           <Modal.Header>
             <Modal.CloseButton onClick={this.close} />
           </Modal.Header>
@@ -74,7 +80,7 @@ class MarketplaceModelessOverlay extends React.Component {
               Save
             </Button>
           </Modal.Footer>
-        </ModelessOverlay>
+        </Modal>
       </div>
     );
   }

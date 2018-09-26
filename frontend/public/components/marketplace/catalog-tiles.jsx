@@ -45,7 +45,7 @@ class MarketplaceCatalogTileView extends React.Component {
   render() {
     const { showAll } = this.state;
 
-    const activeCategory = showAll ? mockItems.find(category => category.id === showAll) : null;
+    const activeCategory = showAll ? mockTileItems.find(category => category.id === showAll) : null;
 
     return (
       <div>
@@ -57,7 +57,7 @@ class MarketplaceCatalogTileView extends React.Component {
           {activeCategory && <Breadcrumb.Item active>{activeCategory.category}</Breadcrumb.Item>}
         </Breadcrumb>
 
-        <MarketplaceToolbar onSortChanged={null} />
+        <MarketplaceToolbar onSortChanged={null} numItems={activeCategory ? activeCategory.items.length : mockTileItems.reduce((total, x) => total + x.items.length, 0) } />
 
         <CatalogTileView>
           {activeCategory
