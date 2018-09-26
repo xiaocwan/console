@@ -12,6 +12,7 @@
 @import '~patternfly-react/dist/sass/patternfly-react';
 @import "~bootstrap-sass/assets/stylesheets/bootstrap/variables";
 @import "~bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+@import '~patternfly-react-extensions/dist/sass/patternfly-react-extensions';
 @import "~font-awesome-sass/assets/stylesheets/font-awesome/variables";
 @import "~xterm/dist/addons/fullscreen/fullscreen";
 @import "~openshift-logos-icon/style";
@@ -48,7 +49,6 @@
 @import "components/utils/selector";
 @import "components/utils/log-window";
 @import "components/utils/resource-log";
-@import "components/alert";
 @import "components/build-pipeline";
 @import "components/chargeback";
 @import "components/cluster-overview";
@@ -59,6 +59,7 @@
 @import "components/dropdown";
 @import "components/global-notification";
 @import "components/list";
+@import "components/monitoring";
 @import "components/nav-title";
 @import "components/node-ip-list";
 @import "components/overflow";
@@ -75,7 +76,7 @@
 @import "components/toggle-play";
 @import "components/users";
 @import "components/volume-icon";
-@import "components/vert-nav";
+@import "components/horizontal-nav";
 @import "components/edit-yaml";
 @import "components/factory/modal-wrapper";
 @import "components/cluster-picker";

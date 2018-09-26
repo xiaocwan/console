@@ -55,3 +55,37 @@ $catalog-item-icon-size-sm: 24px;
     }
   }
 }
+
+a.co-catalog-item-tile {
+  color: inherit;
+  text-decoration: none;
+  :active,
+  :hover,
+  :visited {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+.co-catalog-page {
+  display: flex;
+}
+
+.co-catalog-page__tabs { // temp spacer until we add content to filter panel
+  width: 198px;
+}
+
+.co-catalog-page__content {
+  flex: 1;
+}
+
+.co-catalog-page__heading {
+  font-size: 16px;
+  font-weight: 400;
+  padding-bottom: 18px;
+}
+
+.co-catalog-page__num-items {
+  font-weight: 700;
+  padding-bottom: 32px;
+}

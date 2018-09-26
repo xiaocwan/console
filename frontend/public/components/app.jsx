@@ -18,6 +18,7 @@ import { Masthead } from './masthead';
 import { NamespaceSelector } from './namespace';
 import { Nav } from './nav';
 import { SearchPage } from './search';
+import { SilencesPage, SilencesDetailsPage } from './silence';
 import { ResourceDetailsPage, ResourceListPage } from './resource-list';
 import { history, AsyncComponent, Loading } from './utils';
 import { namespacedPrefixes } from './utils/link';
@@ -62,14 +63,14 @@ _.each(namespacedPrefixes, p => {
   namespacedRoutes.push(`${p}/all-namespaces`);
 });
 
-const NamespaceRedirect = () => {
+const NamespaceRedirect = ({location}) => {
   const activeNamespace = getActiveNamespace();
 
   let to;
   if (activeNamespace === ALL_NAMESPACES_KEY) {
-    to = '/status/all-namespaces';
+    to = `${location.pathname}/all-namespaces`;
   } else if (activeNamespace) {
-    to = `/status/ns/${activeNamespace}`;
+    to = `${location.pathname}/ns/${activeNamespace}`;
   }
   // TODO: check if namespace exists
   return <Redirect to={to} />;
@@ -130,13 +131,21 @@ class App extends React.PureComponent {
         <GlobalNotifications />
         <Switch>
           <Route path={['/all-namespaces', '/ns/:ns',]} component={RedirectComponent} />
+
+          <LazyRoute path="/overview/ns/:ns" exact loader={() => import('./overview' /* webpackChunkName: "overview" */).then(m => m.OverviewPage)} />
+          <LazyRoute path="/overview/all-namespaces" exact loader={() => import('./overview' /* webpackChunkName: "overview" */).then(m => m.OverviewPage)} />
+          <Route path="/overview" exact component={NamespaceRedirect} />
+
+          <LazyRoute path="/catalog/all-namespaces" exact loader={() => import('./catalog' /* webpackChunkName: "catalog" */).then(m => m.CatalogPage)} />
+          <LazyRoute path="/catalog/ns/:ns" exact loader={() => import('./catalog' /* webpackChunkName: "catalog" */).then(m => m.CatalogPage)} />
+          <Route path="/catalog" exact component={NamespaceRedirect} />
+
           <LazyRoute path="/status/all-namespaces" exact loader={() => import('./cluster-overview' /* webpackChunkName: "cluster-overview" */).then(m => m.ClusterOverviewPage)} />
           <LazyRoute path="/status/ns/:ns" exact loader={() => import('./cluster-overview' /* webpackChunkName: "cluster-overview" */).then(m => m.ClusterOverviewPage)} />
           <Route path="/status" exact component={NamespaceRedirect} />
 
           <LazyRoute path="/cluster-health" exact loader={() => import('./cluster-health' /* webpackChunkName: "cluster-health" */).then(m => m.ClusterHealth)} />
           <LazyRoute path="/start-guide" exact loader={() => import('./start-guide' /* webpackChunkName: "start-guide" */).then(m => m.StartGuidePage)} />
-          <LazyRoute path="/overview/ns/:ns" exact loader={() => import('./overview' /* webpackChunkName: "overview" */).then(m => m.OverviewPage)} />
 
           <LazyRoute path={`/k8s/ns/:ns/${SubscriptionModel.plural}/new`} exact loader={() => import('./operator-lifecycle-manager').then(m => NamespaceFromURL(m.CreateSubscriptionYAML))} />
 
@@ -189,9 +198,12 @@ class App extends React.PureComponent {
           <LazyRoute path="/k8s/cluster/clusterrolebindings/:name/copy" exact kind="ClusterRoleBinding" loader={() => import('./RBAC' /* webpackChunkName: "rbac" */).then(m => m.CopyRoleBinding)} />
           <LazyRoute path="/k8s/cluster/clusterrolebindings/:name/edit" exact kind="ClusterRoleBinding" loader={() => import('./RBAC' /* webpackChunkName: "rbac" */).then(m => m.EditRoleBinding)} />
 
+          <Redirect from="/monitoring" exact to="/monitoring/alerts" />
           <Route path="/monitoring/alerts" exact component={AlertsPage} />
           <Route path="/monitoring/alerts/:name" exact component={AlertsDetailsPage} />
-          <Route path="/monitoring/alerts/rules/:name" exact component={AlertRulesDetailsPage} />
+          <Route path="/monitoring/alertrules/:name" exact component={AlertRulesDetailsPage} />
+          <Route path="/monitoring/silences" exact component={SilencesPage} />
+          <Route path="/monitoring/silences/:id" exact component={SilencesDetailsPage} />
 
           <Route path="/k8s/cluster/:plural" exact component={ResourceListPage} />
           <LazyRoute path="/k8s/cluster/:plural/new" exact loader={() => import('./create-yaml' /* webpackChunkName: "create-yaml" */).then(m => m.CreateYAML)} />

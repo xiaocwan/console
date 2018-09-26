@@ -5,9 +5,10 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 
 import { k8sCreate, k8sUpdate, K8sResourceKind, referenceFor } from '../../module/k8s';
-import { ButtonBar, Firehose, history, kindObj, StatusBox, LoadingBox, Dropdown, resourceObjPath } from '../utils';
+import { ButtonBar, Firehose, history, StatusBox, LoadingBox, Dropdown, resourceObjPath } from '../utils';
 import { formatNamespacedRouteForResource } from '../../ui/ui-actions';
 import { AsyncComponent } from '../utils/async';
+import { SecretModel } from '../../models';
 import { WebHookSecretKey } from '../secret';
 
 enum SecretTypeAbstraction {
@@ -141,13 +142,12 @@ const withSecretForm = (SubForm) => class SecretFormComponent extends React.Comp
   }
   save (e) {
     e.preventDefault();
-    const { kind, metadata } = this.state.secret;
+    const { metadata } = this.state.secret;
     this.setState({ inProgress: true });
     const newSecret = _.assign({}, this.state.secret, {stringData: this.state.stringData}, {type: this.state.type});
-    const ko = kindObj(kind);
     (this.props.isCreate
-      ? k8sCreate(ko, newSecret)
-      : k8sUpdate(ko, newSecret, metadata.namespace, newSecret.metadata.name)
+      ? k8sCreate(SecretModel, newSecret)
+      : k8sUpdate(SecretModel, newSecret, metadata.namespace, newSecret.metadata.name)
     ).then(secret => {
       this.setState({inProgress: false});
       history.push(resourceObjPath(secret, referenceFor(secret)));
@@ -584,9 +584,9 @@ class SourceSecretForm extends React.Component<SourceSecretFormProps, SourceSecr
     this.changeAuthenticationType = this.changeAuthenticationType.bind(this);
     this.onDataChanged = this.onDataChanged.bind(this);
   }
-  changeAuthenticationType(event) {
+  changeAuthenticationType(type: SecretType) {
     this.setState({
-      type: event.target.value
+      type: type,
     }, () => this.props.onChange(this.state));
   }
   onDataChanged (secretsData) {
@@ -595,15 +595,16 @@ class SourceSecretForm extends React.Component<SourceSecretFormProps, SourceSecr
     }, () => this.props.onChange(this.state));
   }
   render () {
+    const authTypes = {
+      [SecretType.basicAuth]: 'Basic Authentication',
+      [SecretType.sshAuth]: 'SSH Key',
+    };
     return <React.Fragment>
       {this.props.isCreate
         ? <div className="form-group">
           <label className="control-label" htmlFor="secret-type">Authentication Type</label>
-          <div>
-            <select onChange={this.changeAuthenticationType} value={this.state.type} className="form-control" id="secret-type">
-              <option value={SecretType.basicAuth}>Basic Authentication</option>
-              <option value={SecretType.sshAuth}>SSH Key</option>
-            </select>
+          <div className="co-create-secret__dropdown">
+            <Dropdown title="Basic Authentication" items={authTypes} dropDownClassName="dropdown--full-width" id="dropdown-selectbox" onChange={this.changeAuthenticationType} />
           </div>
         </div>
         : null

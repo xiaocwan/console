@@ -1,47 +1,55 @@
 import * as React from 'react';
 import * as _ from 'lodash-es';
 import * as PropTypes from 'prop-types';
+import * as classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import { ListView, ListViewItem } from 'patternfly-react';
+import { ListView } from 'patternfly-react';
 
-import { ResourceLink, resourcePath} from './utils';
+import { ResourceLink, resourcePath } from './utils';
+
 
 export const ComponentLabel = ({text}) => <div className="co-component-label">{text}</div>;
 
-const ProjectOverviewListItem = ({obj}) => {
-  const {currentController, kind, metadata} = obj;
-  const {namespace, name, uid} = metadata;
+const ProjectOverviewListItem = ({item, onClick, selectedItem}) => {
+  const {controller, readiness, obj} = item;
+  const {namespace, name, uid} = obj.metadata;
+  const isSelected = uid === _.get(selectedItem, 'obj.metadata.uid', '');
+  const className = classnames('project-overview__item', {'project-overview__item--selected': isSelected});
   const heading = <h3 className="project-overview__item-heading">
     <ResourceLink
       className="co-resource-link-truncate"
-      kind={kind}
+      kind={obj.kind}
       name={name}
       namespace={namespace}
     />
   </h3>;
 
   const additionalInfo = <div key={uid} className="project-overview__additional-info">
-    { currentController &&
+    { controller &&
       <div className="project-overview__detail project-overview__detail--controller">
-        <ComponentLabel text={_.startCase(currentController.kind)} />
+        <ComponentLabel text={_.startCase(controller.obj.kind)} />
         <ResourceLink
           className="co-resource-link-truncate"
-          kind={currentController.kind}
-          name={currentController.metadata.name}
+          kind={controller.obj.kind}
+          name={_.get(controller, 'obj.metadata.name')}
           namespace={namespace}
         />
       </div>
     }
-    <div className="project-overview__detail project-overview__detail--status">
-      <ComponentLabel text="Status" />
-      <Link to={`${resourcePath(kind, name, namespace)}/pods`}>
-        {obj.status.replicas || 0} of {obj.spec.replicas} pods
-      </Link>
-    </div>
+    {
+      readiness &&
+      <div className="project-overview__detail project-overview__detail--status">
+        <ComponentLabel text="Status" />
+        <Link to={`${resourcePath(obj.kind, name, namespace)}/pods`}>
+          {readiness.ready} of {readiness.desired} pods
+        </Link>
+      </div>
+    }
   </div>;
 
-  return <ListViewItem
-    className="project-overview__item"
+  return <ListView.Item
+    onClick={() => isSelected ? onClick({}) : onClick(item)}
+    className={className}
     heading={heading}
     additionalInfo={[additionalInfo]}
   />;
@@ -50,17 +58,27 @@ const ProjectOverviewListItem = ({obj}) => {
 ProjectOverviewListItem.displayName = 'ProjectOverviewListItem';
 
 ProjectOverviewListItem.propTypes = {
-  obj: PropTypes.shape({
-    currentController: PropTypes.object,
-    kind: PropTypes.string.isRequired,
-    metadata: PropTypes.object.isRequired
+  item: PropTypes.shape({
+    controller: PropTypes.object,
+    obj: PropTypes.object.isRequired,
+    readiness: PropTypes.object,
   }).isRequired
 };
 
-const ProjectOverviewList = ({items}) =>
-  <ListView className="project-overview__list">
-    {_.map(items, (item) => <ProjectOverviewListItem key={item.metadata.uid} obj={item} />)}
+const ProjectOverviewList = ({items, onClickItem, selectedItem}) => {
+  const listItems = _.map(items, (item) =>
+    <ProjectOverviewListItem
+      key={item.obj.metadata.uid}
+      item={item}
+      onClick={onClickItem}
+      selectedItem={selectedItem}
+    />
+  );
+  return <ListView className="project-overview__list">
+    {listItems}
   </ListView>;
+};
+
 
 ProjectOverviewList.displayName = 'ProjectOverviewList';
 
@@ -68,35 +86,39 @@ ProjectOverviewList.propTypes = {
   items: PropTypes.array.isRequired
 };
 
-const ProjectOverviewGroup = ({heading, items}) =>
+const ProjectOverviewGroup = ({heading, items, onClickItem, selectedItem}) =>
   <div className="project-overview__group">
     {heading && <h2 className="project-overview__group-heading">{heading}</h2>}
-    <ProjectOverviewList items={items} />
+    <ProjectOverviewList items={items} onClickItem={onClickItem} selectedItem={selectedItem} />
   </div>;
 
 
 ProjectOverviewGroup.displayName = 'ProjectOverviewGroup';
 
 ProjectOverviewGroup.propTypes = {
-  heading: PropTypes.string.isRequired,
+  heading: PropTypes.string,
   items: PropTypes.array.isRequired
 };
 
-export const ProjectOverview = ({groups}) => {
-  return <div className="project-overview">
-    { groups.length === 1
-      ? <ProjectOverviewList items={groups[0].items} />
-      : _.map(groups, ({name, items}, index) => <ProjectOverviewGroup key={index} heading={name} items={items} />)
-    }
+export const ProjectOverview = ({selectedItem, groups, onClickItem}) =>
+  <div className="project-overview">
+    {_.map(groups, ({name, items}, index) =>
+      <ProjectOverviewGroup
+        key={`overview-group-${name}${index}`}
+        heading={name}
+        items={items}
+        onClickItem={onClickItem}
+        selectedItem={selectedItem}
+      />
+    )}
   </div>;
-};
 
 ProjectOverview.displayName = 'ProjectOverview';
 
 ProjectOverview.propTypes = {
   groups: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.string.isRequired,
+      name: PropTypes.string,
       items: PropTypes.array.isRequired
     })
   )

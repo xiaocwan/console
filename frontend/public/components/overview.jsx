@@ -2,16 +2,36 @@ import * as React from 'react';
 import * as _ from 'lodash-es';
 import * as fuzzy from 'fuzzysearch';
 import * as PropTypes from 'prop-types';
-import { default as Toolbar } from 'patternfly-react/dist/esm/components/Toolbar/Toolbar';
+import * as classnames from 'classnames';
+import { Toolbar } from 'patternfly-react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
 
 import { StartGuide } from './start-guide';
-import { FLAGS, connectToFlags, flagPending } from '../features';
-import { Dropdown, Firehose, StatusBox } from './utils';
 import { TextFilter } from './factory';
 import { ProjectOverview } from './project-overview';
+import { ResourceOverviewPage } from './resource-list';
+import { ALL_NAMESPACES_KEY } from '../const';
+import {
+  DaemonSetModel,
+  DeploymentModel,
+  DeploymentConfigModel,
+  ReplicationControllerModel,
+  ReplicaSetModel,
+  StatefulSetModel
+} from '../models';
+import {
+  ActionsMenu,
+  CloseButton,
+  Disabled,
+  Dropdown,
+  Firehose,
+  MsgBox,
+  ResourceIcon,
+  StatusBox,
+} from './utils';
 
-const getOwnedResources = (resources, uid) => {
+const getOwnedResources = ({metadata:{uid}}, resources) => {
   return _.filter(resources, ({metadata:{ownerReferences}}) => {
     return _.some(ownerReferences, {
       uid,
@@ -20,42 +40,112 @@ const getOwnedResources = (resources, uid) => {
   });
 };
 
+const sortByRevision = (replicators, annotation, descending = true) => {
+  const compare = (left, right) => {
+    const leftVersion = parseInt(_.get(left, ['metadata', 'annotations', annotation]), 10);
+    const rightVersion = parseInt(_.get(right, ['metadata', 'annotations', annotation]), 10);
+    if (!_.isFinite(leftVersion) && !_.isFinite(rightVersion)) {
+      const leftName = _.get(left, 'metadata.name', '');
+      const rightName = _.get(right, 'metadata.name', '');
+      if (descending) {
+        return rightName.localeCompare(leftName);
+      }
+      return leftName.localeCompare(rightName);
+    }
 
-const OverviewToolbar = ({groupOptions, handleFilterChange, handleGroupChange, selectedGroup}) =>
-  <Toolbar className="overview-toolbar">
-    <Toolbar.RightContent>
-      {
-        !_.isEmpty(groupOptions) &&
+    if (!leftVersion) {
+      return descending ? 1 : -1;
+    }
+
+    if (!rightVersion) {
+      return descending ? -1 : 1;
+    }
+
+    if (descending) {
+      return rightVersion - leftVersion;
+    }
+
+    return leftVersion - rightVersion;
+  };
+
+  return _.toArray(replicators).sort(compare);
+};
+
+const sortReplicaSetsByRevision = (replicaSets) => {
+  return sortByRevision(replicaSets, 'deployment.kubernetes.io/revision');
+};
+
+const sortReplicationControllersByRevision = (replicationControllers) => {
+  return sortByRevision(replicationControllers, 'openshift.io/deployment-config.latest-version');
+};
+
+export const ResourceOverviewHeading = ({kindObj, actions, resource }) => <div className="co-m-nav-title resource-overview__heading">
+  <h1 className="co-m-pane__heading">
+    <div className="co-m-pane__name">
+      <ResourceIcon className="co-m-resource-icon--lg pull-left" kind={kindObj.kind} />
+      {resource.metadata.name}
+    </div>
+    <div className="co-actions">
+      <ActionsMenu actions={actions.map(a => a(kindObj, resource))} />
+    </div>
+  </h1>
+</div>;
+
+const OverviewHeading = ({disabled, groupOptions, handleFilterChange, handleGroupChange, selectedGroup, title}) =>
+  <div className="co-m-nav-title co-m-nav-title--overview">
+    {
+      title &&
+      <h1 className="co-m-pane__heading">
+        <div className="co-m-pane__name">{title}</div>
+      </h1>
+    }
+    <Toolbar className="overview-toolbar">
+      <Toolbar.RightContent>
+        {
+          !_.isEmpty(groupOptions) &&
+          <div className="form-group overview-toolbar__form-group">
+            <label className="overview-toolbar__label">
+              Group by label
+            </label>
+            <Dropdown
+              className="overview-toolbar__dropdown"
+              disabled={disabled}
+              items={groupOptions}
+              onChange={handleGroupChange}
+              style={{display: 'inline-block'}}
+              title={selectedGroup}
+            />
+          </div>
+        }
         <div className="form-group overview-toolbar__form-group">
-          <label className="overview-toolbar__label">
-            Group by label
-          </label>
-          <Dropdown
-            className="overview-toolbar__dropdown"
-            disabled={_.isEmpty(groupOptions)}
-            items={groupOptions}
-            onChange={handleGroupChange}
-            style={{display: 'inline-block'}}
-            title={selectedGroup}
+          <TextFilter
+            autofocus={!disabled}
+            disabled={disabled}
+            label="Resources by name"
+            onChange={handleFilterChange}
           />
         </div>
-      }
-      <div className="form-group overview-toolbar__form-group">
-        <TextFilter
-          label="Resources by name"
-          onChange={handleFilterChange}
-        />
-      </div>
-    </Toolbar.RightContent>
-  </Toolbar>;
+      </Toolbar.RightContent>
+    </Toolbar>
+  </div>;
 
-OverviewToolbar.displayName = 'OverviewToolbar';
+OverviewHeading.displayName = 'OverviewHeading';
 
-OverviewToolbar.propTypes = {
-  groupOptions: PropTypes.object.isRequired,
-  handleFilterChange: PropTypes.func.isRequired,
-  handleGroupChange: PropTypes.func.isRequired,
-  selectedGroup: PropTypes.string.isRequired
+OverviewHeading.propTypes = {
+  disabled: PropTypes.bool,
+  groupOptions: PropTypes.object,
+  handleFilterChange: PropTypes.func,
+  handleGroupChange: PropTypes.func,
+  selectedGroup: PropTypes.string,
+  title: PropTypes.string
+};
+
+OverviewHeading.defaultProps = {
+  disabled: false,
+  groupOptions: {},
+  handleFilterChange: _.noop,
+  handleGroupChange: _.noop,
+  selectedGroup: ''
 };
 
 class OverviewDetails extends React.Component {
@@ -76,14 +166,17 @@ class OverviewDetails extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    const {deployments, deploymentConfigs, namespace, pods, replicaSets, replicationControllers} = this.props;
+    const {daemonSets, deployments, deploymentConfigs, loaded, namespace, pods, replicaSets, replicationControllers} = this.props;
     const {filterValue, selectedGroupLabel} = this.state;
-    if (namespace !== prevProps.namespace
-      || replicationControllers !== prevProps.replicationControllers
-      || replicaSets !== prevProps.replicaSets
-      || pods !== prevProps.pods
-      || deploymentConfigs !== prevProps.deploymentConfigs
-      || deployments !== prevProps.deployments) {
+
+    if (!_.isEqual(namespace, prevProps.namespace)
+      || loaded !== prevProps.loaded
+      || !_.isEqual(daemonSets, prevProps.daemonSets)
+      || !_.isEqual(deploymentConfigs, prevProps.deploymentConfigs)
+      || !_.isEqual(deployments, prevProps.deployments)
+      || !_.isEqual(pods, prevProps.pods)
+      || !_.isEqual(replicaSets, prevProps.replicaSets)
+      || !_.isEqual(replicationControllers, prevProps.replicationControllers)) {
       this.createOverviewData();
     } else if (filterValue !== prevState.filterValue) {
       const filteredItems = this.filterItems(this.state.items);
@@ -98,47 +191,9 @@ class OverviewDetails extends React.Component {
     }
   }
 
-  sortByRevision(replicators, descending, annotation) {
-    const compare = (left, right) => {
-      const leftVersion = parseInt(_.get(left, ['metadata', 'annotations', annotation]), 10);
-      const rightVersion = parseInt(_.get(right, ['metadata', 'annotations', annotation]), 10);
-      if (!_.isFinite(leftVersion) && !_.isFinite(rightVersion)) {
-        const leftName = _.get(left, 'metadata.name', '');
-        const rightName = _.get(right, 'metadata.name', '');
-        if (descending) {
-          return rightName.localeCompare(leftName);
-        }
-        return leftName.localeCompare(rightName);
-      }
-
-      if (!leftVersion) {
-        return descending ? 1 : -1;
-      }
-
-      if (!rightVersion) {
-        return descending ? -1 : 1;
-      }
-
-      if (descending) {
-        return rightVersion - leftVersion;
-      }
-
-      return leftVersion - rightVersion;
-    };
-
-    return _.toArray(replicators).sort(compare);
-  }
-
-  sortRSByRevison(replicaSets, descending) {
-    return this.sortByRevision(replicaSets, descending, 'deployment.kubernetes.io/revision');
-  }
-
-  sortRCByRevision(replicationControllers, descending) {
-    return this.sortByRevision(replicationControllers, descending, 'openshift.io/deployment-config.latest-version');
-  }
-
   filterItems(items) {
     const {filterValue} = this.state;
+    const {selectedItem} = this.props;
 
     if (!filterValue) {
       return items;
@@ -146,7 +201,7 @@ class OverviewDetails extends React.Component {
 
     const filterString = filterValue.toLowerCase();
     return _.filter(items, item => {
-      return fuzzy(filterString, _.get(item, 'metadata.name', ''));
+      return fuzzy(filterString, _.get(item, 'obj.metadata.name', '')) || _.get(item, 'obj.metadata.uid') === _.get(selectedItem, 'obj.metadata.uid');
     });
   }
 
@@ -162,10 +217,10 @@ class OverviewDetails extends React.Component {
     };
 
     if (!label) {
-      return items;
+      return [{items}];
     }
 
-    const groups = _.groupBy(items, item => _.get(item, ['metadata', 'labels', label], 'other'));
+    const groups = _.groupBy(items, item => _.get(item, ['obj', 'metadata', 'labels', label], 'other'));
     return _.map(groups, (group, name) => {
       return {
         name,
@@ -176,7 +231,7 @@ class OverviewDetails extends React.Component {
 
   getGroupOptionsFromLabels(items) {
     const {groupOptions} = this.state;
-    const labelKeys = _.flatMap(items, item => _.keys(item.metadata.labels));
+    const labelKeys = _.flatMap(items, item => _.keys(_.get(item,'obj.metadata.labels', {})));
     return _.reduce(labelKeys, (accumulator, key) => {
       if (_.has(key, accumulator)) {
         return accumulator;
@@ -188,63 +243,141 @@ class OverviewDetails extends React.Component {
     }, groupOptions);
   }
 
-  buildGraphForReplicators(replicators, kind) {
+  addPodsToItem(item) {
     const {pods} = this.props;
-    return _.map(replicators, replicator => {
-      const {uid: replicatorUid} = replicator.metadata;
-      const ownedPods = getOwnedResources(pods.data, replicatorUid);
-      return {
-        ...replicator,
-        kind,
-        pods: ownedPods
-      };
+    return {
+      ...item,
+      pods: getOwnedResources(item.obj, pods.data)
+    };
+  }
+
+  addReplicationControllersToItem(item) {
+    const {replicationControllers} = this.props;
+    const ownedRCs = _.map(getOwnedResources(item.obj, replicationControllers.data), rc => {
+      return this.addPodsToItem({
+        obj: {
+          ...rc,
+          kind: ReplicationControllerModel.kind
+        }
+      });
+    });
+    const sortedRCs = sortReplicationControllersByRevision(ownedRCs);
+    const latestRC = _.head(sortedRCs);
+    return {
+      ...item,
+      replicationControllers: sortedRCs,
+      controller: latestRC
+    };
+  }
+
+  addReplicaSetsToItem(item) {
+    const {replicaSets} = this.props;
+    const ownedRSs = _.map(getOwnedResources(item.obj, replicaSets.data), rs => {
+      return this.addPodsToItem({
+        obj: {
+          ...rs,
+          kind: ReplicaSetModel.kind
+        }
+      });
+    });
+    const sortedRSs = sortReplicaSetsByRevision(ownedRSs);
+    const latestRS = _.head(sortedRSs);
+    return {
+      ...item,
+      replicaSets: sortedRSs,
+      controller: latestRS
+    };
+  }
+
+  createDaemonSetItems() {
+    const {daemonSets} = this.props;
+    return _.map(daemonSets.data, ds => {
+      return this.addPodsToItem({
+        obj: {
+          ...ds,
+          kind: DaemonSetModel.kind
+        },
+        readiness: {
+          desired: ds.status.desiredNumberScheduled || 0,
+          ready: ds.status.currentNumberScheduled || 0
+        }
+      });
     });
   }
 
-  buildGraphForRootResources(rootResources, kind) {
-    const {replicationControllers, replicaSets} = this.props;
+  createDeploymentItems() {
+    const {deployments} = this.props;
+    return _.map(deployments.data, d => {
+      return this.addReplicaSetsToItem({
+        obj: {
+          ...d,
+          kind: DeploymentModel.kind
+        },
+        readiness: {
+          desired: d.spec.replicas || 0,
+          ready: d.status.replicas || 0
+        }
+      });
+    });
+  }
 
-    return _.map(rootResources, rootResource => {
-      const {uid: rootResourceUid} = rootResource.metadata;
-      // Determine the replication controllers associated with this DC
-      const ownedReplicationControllers = this.buildGraphForReplicators(getOwnedResources(replicationControllers.data, rootResourceUid), 'ReplicationController');
-      const ownedReplicaSets = this.buildGraphForReplicators(getOwnedResources(replicaSets.data, rootResourceUid), 'ReplicaSet');
-      const orderedReplicationControllers = this.sortRCByRevision(ownedReplicationControllers, 'ReplicationController', true);
-      const orderedReplicaSets = this.sortRSByRevison(ownedReplicaSets, 'ReplicaSet', true);
-      const currentController = _.head(orderedReplicationControllers) || _.head(orderedReplicaSets);
+  createDeploymentConfigItems() {
+    const {deploymentConfigs} = this.props;
+    return _.map(deploymentConfigs.data, dc => {
+      return this.addReplicationControllersToItem({
+        obj: {
+          ...dc,
+          kind: DeploymentConfigModel.kind
+        },
+        readiness: {
+          desired: dc.spec.replicas || 0,
+          ready: dc.status.replicas || 0
+        }
+      });
+    });
+  }
 
-      return {
-        ...rootResource,
-        currentController,
-        kind,
-        replicaSets: orderedReplicaSets,
-        replicationControllers: orderedReplicationControllers,
-      };
+  createStatefulSetItems() {
+    const {statefulSets} = this.props;
+    return _.map(statefulSets.data, (ss) => {
+      return this.addPodsToItem({
+        obj: {
+          ...ss,
+          kind: StatefulSetModel.kind
+        },
+        readiness: {
+          desired: ss.spec.replicas || 0,
+          ready: ss.status.replicas || 0
+        }
+      });
     });
   }
 
   createOverviewData() {
-    const {deploymentConfigs, deployments, loaded, statefulSets} = this.props;
+    const {loaded} = this.props;
 
     if (!loaded) {
       return;
     }
 
-    const deploymentConfigItems = this.buildGraphForRootResources(deploymentConfigs.data, 'DeploymentConfig');
-    const deploymentItems = this.buildGraphForRootResources(deployments.data, 'Deployment');
-    const statefulSetItems = this.buildGraphForReplicators(statefulSets.data, 'StatefulSet');
-
     const items = [
-      ...deploymentConfigItems,
-      ...deploymentItems,
-      ...statefulSetItems
+      ...this.createDaemonSetItems(),
+      ...this.createDeploymentItems(),
+      ...this.createDeploymentConfigItems(),
+      ...this.createStatefulSetItems()
     ];
 
     const filteredItems = this.filterItems(items);
     const groupOptions = this.getGroupOptionsFromLabels(filteredItems);
     const selectedGroupLabel = _.has(groupOptions, 'app') ? 'app' : _.head(_.keys(groupOptions));
     const groupedItems = this.groupItems(filteredItems, selectedGroupLabel);
-    this.setState({items, filteredItems, groupedItems, groupOptions, selectedGroupLabel});
+    this.setState({
+      filteredItems,
+      groupedItems,
+      groupOptions,
+      items,
+      selectedGroupLabel
+    });
   }
 
   handleFilterChange(event) {
@@ -260,27 +393,28 @@ class OverviewDetails extends React.Component {
   }
 
   render() {
-    const {loaded, loadError} = this.props;
-    const {filteredItems, filterValue, groupedItems, groupOptions, selectedGroupLabel} = this.state;
-
+    const {loaded, loadError, selectedItem, title} = this.props;
+    const {filteredItems, groupedItems, groupOptions, selectedGroupLabel} = this.state;
     return <div className="co-m-pane">
-      <div className="co-m-nav-title co-m-nav-title--overview">
-        <h1 className="co-m-pane__heading">
-          <div className="co-m-pane__name">
-            <span id="resource-title">Overview</span>
-          </div>
-        </h1>
-        <OverviewToolbar
-          filterValue={filterValue}
-          groupOptions={groupOptions}
-          handleFilterChange={this.handleFilterChange}
-          handleGroupChange={this.handleGroupChange}
-          selectedGroup={selectedGroupLabel}
-        />
-      </div>
+      <OverviewHeading
+        groupOptions={groupOptions}
+        handleFilterChange={this.handleFilterChange}
+        handleGroupChange={this.handleGroupChange}
+        selectedGroup={selectedGroupLabel}
+        title={title}
+      />
       <div className="co-m-pane__body">
-        <StatusBox data={filteredItems} loaded={loaded} loadError={loadError} label="Resources">
-          <ProjectOverview groups={groupedItems} />
+        <StatusBox
+          data={filteredItems}
+          loaded={loaded}
+          loadError={loadError}
+          label="Resources"
+        >
+          <ProjectOverview
+            selectedItem={selectedItem}
+            groups={groupedItems}
+            onClickItem={this.props.selectItem}
+          />
         </StatusBox>
       </div>
     </div>;
@@ -300,87 +434,133 @@ OverviewDetails.propTypes = {
   statefulSets: PropTypes.object,
 };
 
-export const Overview = ({namespace}) => {
-  const resources = [
-    {
-      isList: true,
-      kind: 'Pod',
-      namespace,
-      prop: 'pods'
-    },
-    {
-      isList: true,
-      kind: 'ReplicationController',
-      namespace,
-      prop: 'replicationControllers'
-    },
-    {
-      isList: true,
-      kind: 'DeploymentConfig',
-      namespace,
-      prop: 'deploymentConfigs'
-    },
-    {
-      isList: true,
-      kind: 'Deployment',
-      namespace,
-      prop: 'deployments'
-    },
-    {
-      isList: true,
-      kind: 'ReplicaSet',
-      namespace,
-      prop: 'replicaSets'
-    },
-    {
-      isList: true,
-      kind: 'StatefulSet',
-      namespace,
-      prop: 'statefulSets'
+export class Overview extends React.Component {
+  constructor(props){
+    super(props);
+    this.selectItem = this.selectItem.bind(this);
+    this.state = {
+      selectedItem: {}
+    };
+  }
+
+  selectItem(selectedItem){
+    this.setState({selectedItem});
+  }
+
+  render() {
+    const {namespace, title} = this.props;
+    const {selectedItem} = this.state;
+    const className = classnames('overview', {'overview--sidebar-shown': !_.isEmpty(selectedItem)});
+    const resources = [
+      {
+        isList: true,
+        kind: 'DaemonSet',
+        namespace,
+        prop: 'daemonSets'
+      },
+      {
+        isList: true,
+        kind: 'Deployment',
+        namespace,
+        prop: 'deployments'
+      },
+      {
+        isList: true,
+        kind: 'DeploymentConfig',
+        namespace,
+        prop: 'deploymentConfigs'
+      },
+      {
+        isList: true,
+        kind: 'Pod',
+        namespace,
+        prop: 'pods'
+      },
+      {
+        isList: true,
+        kind: 'ReplicaSet',
+        namespace,
+        prop: 'replicaSets'
+      },
+      {
+        isList: true,
+        kind: 'ReplicationController',
+        namespace,
+        prop: 'replicationControllers'
+      },
+      {
+        isList: true,
+        kind: 'StatefulSet',
+        namespace,
+        prop: 'statefulSets'
+      }
+    ];
+
+    if (_.isEmpty(namespace) || namespace === ALL_NAMESPACES_KEY) {
+      return <div className="co-m-pane">
+        <Disabled>
+          <OverviewHeading disabled title={title} />
+        </Disabled>
+        <div className="co-m-pane__body">
+          <MsgBox
+            detail={<React.Fragment>
+              Select a project from the dropdown above to see an overview of its workloads.
+              To view the status of all projects in the cluster, go to the <Link to="/status">status page</Link>.
+            </React.Fragment>}
+            title="Select a Project"
+          />
+        </div>
+      </div>;
     }
-  ];
-  return <div className="overview">
-    <Firehose resources={resources}>
-      <OverviewDetails />
-    </Firehose>
-  </div>;
-};
+
+    return <div className={className}>
+      <div className="overview__body">
+        <Firehose resources={resources} forceUpdate={true}>
+          <OverviewDetails
+            namespace={namespace}
+            selectedItem={selectedItem}
+            selectItem={this.selectItem}
+            title={title}
+          />
+        </Firehose>
+      </div>
+      {
+        !_.isEmpty(selectedItem) &&
+        <div className="overview__sidebar">
+          <div className="overview__sidebar-dismiss clearfix">
+            <CloseButton onClick={() => this.selectItem({})} />
+          </div>
+          <ResourceOverviewPage
+            kind={selectedItem.obj.kind}
+            resource={selectedItem.obj}
+          />
+        </div>
+      }
+    </div>;
+  }
+}
 
 Overview.displayName = 'Overview';
 
 Overview.propTypes = {
-  namespace: PropTypes.string.isRequired,
+  namespace: PropTypes.string,
+  title: PropTypes.string
 };
 
-
-class OverviewPage_ extends React.PureComponent {
-  render() {
-    const {match, flags} = this.props;
-    const namespace = _.get(match, 'params.ns');
-    const fake = flags.OPENSHIFT && !flags.PROJECTS_AVAILABLE;
-
-    if (flagPending(flags.OPENSHIFT) || flagPending(flags.PROJECTS_AVAILABLE)) {
-      return null;
-    }
-
-    return <React.Fragment>
-      <StartGuide dismissible={true} style={{margin: 15}} />
-      <Helmet>
-        <title>Project Overview</title>
-      </Helmet>
-      <Overview
-        fake={fake} //TODO implement first time user experience using this prop as a flag
-        namespace={namespace}
-      />
-    </React.Fragment>;
-  }
-}
-
-OverviewPage_.displayName = 'OverviewPage';
-
-OverviewPage_.propTypes = {
-  match: PropTypes.object.isRequired,
-  flags: PropTypes.object.isRequired
+export const OverviewPage = ({match}) => {
+  const namespace = _.get(match, 'params.ns');
+  const title = 'Project Overview';
+  return <React.Fragment>
+    <Helmet>
+      <title>{title}</title>
+    </Helmet>
+    <StartGuide dismissible={true} style={{margin: 15}} />
+    <Overview namespace={namespace} title={title} />
+  </React.Fragment>;
 };
 
-export const OverviewPage = connectToFlags(FLAGS.OPENSHIFT, FLAGS.PROJECTS_AVAILABLE)(OverviewPage_);
+OverviewPage.displayName = 'OverviewPage';
+
+OverviewPage.propTypes = {
+  match: PropTypes.object.isRequired
+};
