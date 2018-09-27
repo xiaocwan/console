@@ -4,25 +4,44 @@ import PropTypes from 'prop-types';
 import { Button, Modal } from 'patternfly-react';
 import { CatalogTile, CatalogTileBadge, CatalogItemHeader, PropertiesSidePanel, PropertyItem } from 'patternfly-react-extensions';
 
+import { AdminSubscribe } from './admin-subscribe';
 import { mockPropertyItems } from './mockItems';
 
 class MarketplaceModelessOverlay extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showOverlay: false
+      showOverlay: false,
+      showSubscribe: false
     };
   }
+
   close = () => {
     this.setState({
-      showOverlay: false
+      showOverlay: false,
+      showSubscribe: false
     });
   };
+
+  openSubscribe = () => {
+    this.setState({
+      showSubscribe: true
+    })
+  };
+
+  closeSubscribe = subscription => {
+    if (subscription) {
+      // TODO: Do something with subscription form
+    }
+    this.close();
+  };
+
   toggleOpen = () => {
     this.setState({
       showOverlay: !this.state.showOverlay
     });
   };
+
   getBadges = item => {
     const badges = [];
 
@@ -36,8 +55,10 @@ class MarketplaceModelessOverlay extends React.Component {
 
     return badges;
   };
+
   render() {
     const { size, item } = this.props;
+    const { showSubscribe } = this.state;
 
     return (
       <div>
@@ -54,32 +75,40 @@ class MarketplaceModelessOverlay extends React.Component {
           <Modal.Header>
             <Modal.CloseButton onClick={this.close} />
           </Modal.Header>
-          <Modal.Body>
-            <CatalogItemHeader
-              className="long-description-test"
-              iconImg={item.image}
-              title={item.title}
-              vendor={<span> {item.vendor}</span>}
-            />
-            <div className="co-marketplace-modal">
-              <div className="co-marketplace-modal--item co-marketplace-modal--properties">
-                <PropertiesSidePanel>
-                  { mockPropertyItems.map( (item, index) => <PropertyItem key={index} label={item.label} value={item.value} />)}
-                </PropertiesSidePanel>
-              </div>
-              <div className="co-marketplace-modal--item co-marketplace-modal--description">
-                {item.description}
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button bsStyle="default" className="btn-cancel" onClick={this.close}>
-              Cancel
-            </Button>
-            <Button bsStyle="primary" onClick={this.close}>
-              Save
-            </Button>
-          </Modal.Footer>
+          {showSubscribe &&
+            <React.Fragment>
+              <Modal.Body>
+                <AdminSubscribe item={item} close={this.closeSubscribe} />
+              </Modal.Body>
+            </React.Fragment>
+          }
+          {!showSubscribe &&
+            <React.Fragment>
+              <Modal.Body>
+                <CatalogItemHeader
+                  className="long-description-test"
+                  iconImg={item.image}
+                  title={item.title}
+                  vendor={<span> {item.vendor}</span>}
+                />
+                <div className="co-marketplace-modal">
+                  <div className="co-marketplace-modal--item co-marketplace-modal--properties__border">
+                    <Button bsStyle="primary" style={{ width : '100%' }} onClick={this.openSubscribe}>
+                      Subscribe
+                    </Button>
+                    <br/>
+                    <br></br>
+                    <PropertiesSidePanel>
+                      {mockPropertyItems.map((item, index) => <PropertyItem key={index} label={item.label} value={item.value} />)}
+                    </PropertiesSidePanel>
+                  </div>
+                  <div className="co-marketplace-modal--item co-marketplace-modal--description">
+                    {item.description}
+                  </div>
+                </div>
+              </Modal.Body>
+            </React.Fragment>
+          }
         </Modal>
       </div>
     );
