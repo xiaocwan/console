@@ -17,13 +17,15 @@ export class KubernetesMarketplace extends React.Component {
               <title>Kubernetes Marketplace</title>
             </Helmet>
 
-            <div>
-              <NavTitle title="Kubernetes Markteplace" className="co-marketplace-navtitle"/>
-              <div className="co-m-pane__filter-bar-group co-m-pane__filter-bar-group--filter co-marketplace-navtitle--search">
+            <div className="co-marketplace-header">
+              <div className="co-marketplace-header--navtitle">
+                <NavTitle title="Kubernetes Markteplace"/>
+              </div>
+              <div className="co-m-pane__filter-bar-group co-m-pane__filter-bar-group--filter co-marketplace-header--search">
                 <TextFilter label="Kubernetes Markteplace by name" />
               </div>
             </div>
-
+            
             <div className="co-marketplace-sidepanel">
               <MarketplaceVerticalTabs/>
               <div className="co-marketplace-sidepanel--separator">
