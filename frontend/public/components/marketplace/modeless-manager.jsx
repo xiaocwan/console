@@ -9,18 +9,18 @@ import { mockPropertyItems } from './mockItems';
 class MarketplaceModelessOverlay extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { 
-      showOverlay: false 
+    this.state = {
+      showOverlay: false
     };
   }
   close = () => {
-    this.setState({ 
-      showOverlay: false 
+    this.setState({
+      showOverlay: false
     });
   };
   toggleOpen = () => {
-    this.setState({ 
-      showOverlay: !this.state.showOverlay 
+    this.setState({
+      showOverlay: !this.state.showOverlay
     });
   };
   getBadges = item => {
@@ -61,13 +61,13 @@ class MarketplaceModelessOverlay extends React.Component {
               title={item.title}
               vendor={<span> {item.vendor}</span>}
             />
-            <div style={{ marginTop: '30px', width: '100%', height: '100%'}}>
-              <div style={{ float: 'left', width: '20%', display: 'inline-block', padding: '15px', border: '1px solid grey' }}>
+            <div className="co-marketplace-modal">
+              <div className="co-marketplace-modal--item co-marketplace-modal--properties">
                 <PropertiesSidePanel>
                   { mockPropertyItems.map( (item, index) => <PropertyItem key={index} label={item.label} value={item.value} />)}
                 </PropertiesSidePanel>
               </div>
-              <div style={{ width: '75%', float: 'left', padding: '15px' }}>
+              <div className="co-marketplace-modal--item co-marketplace-modal--description">
                 {item.description}
               </div>
             </div>

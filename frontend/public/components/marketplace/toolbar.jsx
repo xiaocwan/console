@@ -69,14 +69,14 @@ export class MarketplaceToolbar extends React.Component {
     } = this.state;
 
     const { numItems } = this.props
-    
-    return (
-      <Toolbar>
-        <Toolbar.Results>
-            <h5>{ numItems > 0 ? `${numItems} Results` : `no results` }</h5>
-        </Toolbar.Results>
 
-        <Toolbar.RightContent style={{borderLeft:"1px solid rgb(209, 209, 209)"}}>
+    return (
+      <div className="co-marketplace-toolbar">
+        <div className="co-marketplace-toolbar--results">
+            <h5>{ numItems > 0 ? `${numItems} Results` : `no results` }</h5>
+        </div>
+
+        <div className="co-marketplace-toolbar--sort">
           <Sort>
               {'Sort by '}
             <Sort.TypeSelector
@@ -91,8 +91,8 @@ export class MarketplaceToolbar extends React.Component {
                 onClick={() => this.toggleCurrentSortDirection()}
             />
           </Sort>
-        </Toolbar.RightContent>
-      </Toolbar>
+        </div>
+      </div>
     );
   }
 }
