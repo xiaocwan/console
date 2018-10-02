@@ -13,12 +13,40 @@ class MarketplaceCatalogTileView extends React.Component {
     super(props);
 
     this.state = {
-      showAll: null
+      showAll: null,
+      selectedTile: null
     };
   }
 
   onViewAll = id => {
     this.setState({ showAll: id });
+  };
+
+  getBadges = item => {
+    const badges = [];
+
+    if (item.certified) {
+      badges.push(<CatalogTileBadge key="certified" type="fa" name="cog" title="Certified" id="certified" />);
+    }
+
+    if (item.approved) {
+      badges.push(<CatalogTileBadge key="certified" type="pf" name="ok" title="USDA Approved" id="approved" />);
+    }
+
+    return badges;
+  };
+
+  toggleOpen = (item) => {
+    this.setState(prevState => {
+      if (prevState.selectedTile === item) {
+        return {
+          selectedTile: null
+        };
+      }
+      return {
+        selectedTile: item
+      };
+    });
   };
 
   renderCategory = category => {
@@ -34,7 +62,16 @@ class MarketplaceCatalogTileView extends React.Component {
           onViewAll={() => this.onViewAll(category.id)}
         >
           {category.items &&
-            category.items.map((item, index) => <MarketplaceModelessOverlay key={index} item={item} index={index}/>)}
+            category.items.map((item, index) => <CatalogTile
+              key={index}
+              title={item.title}
+              featured={item.featured}
+              iconImg={item.image}
+              vendor={item.vendor}
+              description={item.description}
+              badges={this.getBadges(item)}
+              onClick={() => this.toggleOpen(item)}
+            />)}
         </CatalogTileViewCategory>
       );
     }
@@ -43,7 +80,8 @@ class MarketplaceCatalogTileView extends React.Component {
   };
 
   render() {
-    const { showAll } = this.state;
+    const { showAll, selectedTile } = this.state;
+    const { openSubscribe } = this.props;
 
     const activeCategory = showAll ? mockTileItems.find(category => category.id === showAll) : null;
 
@@ -64,6 +102,8 @@ class MarketplaceCatalogTileView extends React.Component {
             ? this.renderCategory(activeCategory)
             : mockTileItems.map(category => this.renderCategory(category))}
         </CatalogTileView>
+        {selectedTile &&
+          <MarketplaceModelessOverlay item={selectedTile} close={() => this.toggleOpen(null)} openSubscribe={() => openSubscribe(selectedTile)}/>}
       </div>
     );
   }

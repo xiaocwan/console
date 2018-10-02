@@ -133,7 +133,7 @@ class AdminSubscribe extends React.Component {
             title={item.title}
             vendor={<span> {item.vendor}</span>}
           />
-          <div>
+          <div style={{ marginTop : '20px' }}>
             {item.description}
           </div>
         </div>

@@ -8141,9 +8141,9 @@ patternfly-bootstrap-treeview@~2.1.0:
     bootstrap "3.3.x"
     jquery ">= 2.1.x"
 
-patternfly-react-extensions@^2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/patternfly-react-extensions/-/patternfly-react-extensions-2.7.0.tgz#e7b037cae54373c2a83ca60ac1aa2527f1953293"
+patternfly-react-extensions@^2.8.1:
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/patternfly-react-extensions/-/patternfly-react-extensions-2.8.1.tgz#bdbf1ebe9b046bdd2ae80fad68be69338ee76ffd"
   dependencies:
     breakjs "^1.0.0"
     classnames "^2.2.5"
@@ -8174,9 +8174,9 @@ patternfly-react@^2.15.0:
     sortabular "^1.5.1"
     table-resolver "^3.2.0"
 
-patternfly-react@^2.19.0:
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/patternfly-react/-/patternfly-react-2.19.0.tgz#4efd6fd9bc9178a3fb95cd35334a89bd03154dfd"
+patternfly-react@^2.19.1:
+  version "2.19.1"
+  resolved "https://registry.yarnpkg.com/patternfly-react/-/patternfly-react-2.19.1.tgz#38ddbd09f2d3914051a3b3e4a0918c8b1cc00408"
   dependencies:
     bootstrap-slider-without-jquery "^10.0.0"
     breakjs "^1.0.0"
