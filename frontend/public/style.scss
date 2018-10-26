@@ -7,6 +7,9 @@
 // External dependencies that are required/extended by our custom styles (tilde tells Webpack not to use relative path)
 // Patternfly variables must be imported before Bootstrap
 @import '~patternfly/dist/sass/patternfly/variables';
+@import "~patternfly/dist/sass/patternfly/dependencies/bootstrap-switch/variables";
+@import '~patternfly-react-extensions/dist/sass/patternfly-react-extensions';
+@import '~patternfly-react/dist/sass/patternfly-react';
 @import "~bootstrap-sass/assets/stylesheets/bootstrap/variables";
 @import "~bootstrap-sass/assets/stylesheets/bootstrap/mixins";
 @import '~patternfly-react-extensions/dist/sass/patternfly-react-extensions';
@@ -80,6 +83,7 @@
 @import "components/sidebars/resource-sidebar";
 @import "components/operator-lifecycle-manager/operator-lifecycle-manager";
 @import "components/graphs/graphs";
+@import "components/marketplace/marketplace";
 @import "components/modals/modals";
 @import "components/masthead";
 @import "components/nav";

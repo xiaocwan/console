@@ -41,6 +41,20 @@ export const ClusterServiceVersionModel: K8sKind = {
   propagationPolicy : 'Foreground',
 };
 
+export const KubernetesMarketplaceModel: K8sKind = {
+  kind: 'KubernetesMarketplace',
+  label: 'KubernetesMarketplace',
+  labelPlural: 'KubernetesMarketplaces',
+  apiGroup: 'operators.coreos.com',
+  apiVersion: 'v1alpha1',
+  path: 'kubernetesmarketplace',
+  abbr: 'CSV',
+  namespaced: true,
+  crd: true,
+  plural: 'kubernetesmarketplaces',
+  propagationPolicy : 'Foreground',
+};
+
 export const InstallPlanModel: K8sKind = {
   kind: 'InstallPlan',
   label: 'InstallPlan',

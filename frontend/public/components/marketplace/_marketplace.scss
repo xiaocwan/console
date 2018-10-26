@@ -1,0 +1,105 @@
+$marketplace-border-style: 1px solid rgb(209, 209, 209);
+
+.co-marketplace-header {
+  display: block;
+}
+
+.co-marketplace-header--navtitle {
+  display: inline-block;
+}
+
+.co-marketplace-header--search {
+  display: inline-block;
+  float: right;
+  margin-top: 30px;
+  margin-right: 20px;
+}
+
+.co-marketplace-sidepanel {
+  margin: 15px;
+  width: 15%;
+  float: left;
+  display: inline-block;
+}
+
+.co-marketplace-sidepanel--separator {
+  border-bottom:($marketplace-border-style);
+}
+
+.co-marketplace-tileview {
+  width: 80%;
+  float: left;
+  display: flex;
+}
+
+.co-marketplace-toolbar {
+  border-bottom: ($marketplace-border-style);
+  padding-bottom: 10px;
+}
+
+.co-marketplace-toolbar--results {
+  display: inline-block;
+}
+
+.co-marketplace-toolbar--results h5 {
+  font-weight: bold;
+}
+
+.co-marketplace-toolbar--sort {
+  border-left: ($marketplace-border-style);
+  padding-left: 10px;
+  float: right;
+}
+
+.co-marketplace-modal {
+  margin-top: 30px;
+}
+
+.co-marketplace-modal--item {
+  float: left;
+  padding: 15px;
+}
+
+.co-marketplace-modal--properties {
+  width: 20%;
+  display: inline-block;
+  border: ($marketplace-border-style);
+}
+
+.co-marketplace-modal--description {
+  width: 75%;
+}
+
+.co-marketplace-subscribe {
+  padding: 10px;
+  padding-top: 0;
+}
+
+.co-marketplace-subscribe--header {
+  margin-bottom: 20px;
+}
+
+.co-marketplace-subscribe--form {
+  display: inline-block;
+  float: left;
+  width: 40%;
+  padding-right: 20px;
+}
+
+.co-marketplace-subscribe--dropdowns {
+  border-bottom: ($marketplace-border-style);
+}
+
+.co-marketplace-subscribe--dropdownelement {
+  padding-bottom: 20px;
+}
+
+.co-marketplace-subscribe--buttons {
+  padding-top: 20px;
+}
+
+.co-marketplace-subscribe--description {
+  display: inline-block;
+  float: left;
+  width: 55%;
+}
